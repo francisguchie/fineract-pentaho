@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -18,42 +18,18 @@
  */
 package org.apache.fineract.infrastructure.report.service;
 
-import static org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConnection.toJdbcUrl;
-import static org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConnection.toProtocol;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import javax.sql.DataSource;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
-
 import org.apache.fineract.infrastructure.core.api.ApiParameterHelper;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConnection;
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
-import org.apache.fineract.infrastructure.core.service.database.DatabasePasswordEncryptor;
-import org.apache.fineract.infrastructure.dataqueries.data.ReportExportType;
 import org.apache.fineract.infrastructure.report.annotation.ReportService;
+import org.apache.fineract.infrastructure.report.service.database.DatabasePasswordEncryptor;
 import org.apache.fineract.infrastructure.security.constants.TenantConstants;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-
-import org.pentaho.reporting.engine.classic.core.ClassicEngineBoot;
-import org.pentaho.reporting.engine.classic.core.CompoundDataFactory;
-import org.pentaho.reporting.engine.classic.core.DataFactory;
-import org.pentaho.reporting.engine.classic.core.DefaultReportEnvironment;
-import org.pentaho.reporting.engine.classic.core.MasterReport;
+import org.pentaho.reporting.engine.classic.core.*;
 import org.pentaho.reporting.engine.classic.core.modules.misc.datafactory.sql.DriverConnectionProvider;
 import org.pentaho.reporting.engine.classic.core.modules.misc.datafactory.sql.SQLReportDataFactory;
 import org.pentaho.reporting.engine.classic.core.modules.output.pageable.pdf.PdfReportUtil;
@@ -72,6 +48,23 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import static org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConnection.toJdbcUrl;
+import static org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConnection.toProtocol;
+
 @Service
 @ReportService(type = "Pentaho")
 public class PentahoReportingProcessServiceImpl implements ReportingProcessService {
@@ -79,29 +72,24 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
     private static final Logger logger = LoggerFactory.getLogger(PentahoReportingProcessServiceImpl.class);
     private final String mifosBaseDir = System.getProperty("user.home") + File.separator + ".mifosx";
     private final DatabasePasswordEncryptor databasePasswordEncryptor;
-
+    private final PlatformSecurityContext context;
+    private final DataSource tenantDataSource;
+    @Autowired
+    FineractProperties fineractProperties;
+    @Autowired
+    ApplicationContext applicationContext;
+    @Autowired
+    ApplicationContext contextVar;
     @Value("${FINERACT_PENTAHO_REPORTS_PATH}")
     private String fineractPentahoBaseDir;
 
-    private final PlatformSecurityContext context;
-    private final DataSource tenantDataSource;
-
-    @Autowired
-    FineractProperties fineractProperties;
-
-    @Autowired
-    ApplicationContext applicationContext;
-
-    @Autowired
-    ApplicationContext contextVar;
-
     @Autowired
     public PentahoReportingProcessServiceImpl(final PlatformSecurityContext context,
-            final @Qualifier("hikariTenantDataSource") DataSource tenantDataSource, DatabasePasswordEncryptor databasePasswordEncryptor) {
+                                              final @Qualifier("hikariTenantDataSource") DataSource tenantDataSource, DatabasePasswordEncryptor databasePasswordEncryptor) {
         ClassicEngineBoot.getInstance().start();
         this.tenantDataSource = tenantDataSource;
         this.context = context;
-        this.databasePasswordEncryptor = databasePasswordEncryptor ;
+        this.databasePasswordEncryptor = databasePasswordEncryptor;
     }
 
     @Override
@@ -195,7 +183,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             final var rptParamValues = report.getParameterValues();
             final var paramsDefinition = report.getParameterDefinition();
 
-            //only allow integer, long, date and string parameter types and assume all mandatory - could go more
+            // only allow integer, long, date and string parameter types and assume all mandatory - could go more
             // detailed like Pawel did in Mifos later and could match incoming and Pentaho parameters better...
             // currently assuming they come in ok... and if not an error
             for (final ParameterDefinitionEntry paramDefEntry : paramsDefinition.getParameterDefinitions()) {
@@ -227,22 +215,22 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
                         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH);
                         Date date = sdf.parse(myDate);
                         long millis = date.getTime();
-                        java.sql.Date mySQLDate = new java.sql.Date(millis);                        
-                        rptParamValues.put(paramName, mySQLDate);                        
+                        java.sql.Date mySQLDate = new java.sql.Date(millis);
+                        rptParamValues.put(paramName, mySQLDate);
                     } else {
-                        logger.debug("ParamName Unknown: {}", paramName);
-                        logger.debug("ParamValue Unknown: {}", pValue.toString());
+                        logger.warn("ParamName Unknown: {}", paramName);
+                        logger.warn("ParamValue Unknown: {}", pValue.toString());
                         rptParamValues.put(paramName, pValue);
                     }
                 }
             }
 
-            //Tenant database name and current user's office hierarchy
+            // Tenant database name and current user's office hierarchy
             // passed as parameters to allow multitenant Pentaho reporting
             // and data scoping
             final var tenant = ThreadLocalContextUtil.getTenant();
-            final var tenantConnection = tenant.getConnection();            
-            String protocol = toProtocol(this.tenantDataSource);            
+            final var tenantConnection = tenant.getConnection();
+            String protocol = toProtocol(this.tenantDataSource);
             Environment environment = contextVar.getEnvironment();
             String tenantUrl = toJdbcUrl(protocol, tenantConnection.getSchemaServer(), tenantConnection.getSchemaServerPort(),
                     tenantConnection.getSchemaName(), tenantConnection.getSchemaConnectionParameters());
@@ -259,18 +247,17 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
             rptParamValues.put("userid", userid);
 
-            rptParamValues.put("tenantUrl", tenantUrl.trim());
-            
+            rptParamValues.put("tenantUrl", tenantUrl);
             if (tenantConnection.getSchemaUsername().equalsIgnoreCase("") || tenantConnection.getSchemaUsername() == null) {
                 rptParamValues.put("username", environment.getProperty("FINERACT_DEFAULT_TENANTDB_UID"));
             } else {
-                rptParamValues.put("username", tenantConnection.getSchemaUsername().trim());
+                rptParamValues.put("username", tenantConnection.getSchemaUsername());
             }
 
-            if (tenantConnection.getSchemaPassword().equalsIgnoreCase("") || tenantConnection.getSchemaPassword() == null) {                
+            if (tenantConnection.getSchemaPassword().equalsIgnoreCase("") || tenantConnection.getSchemaPassword() == null) {
                 rptParamValues.put("password", environment.getProperty("FINERACT_DEFAULT_TENANTDB_PWD"));
             } else {
-                rptParamValues.put("password", databasePasswordEncryptor.decrypt(tenantConnection.getSchemaPassword()).trim()); 
+                rptParamValues.put("password", databasePasswordEncryptor.decrypt(tenantConnection.getSchemaPassword()));
             }
 
         } catch (Throwable t) {
@@ -317,7 +304,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             connectionProvider.setUrl(getTenantUrl());
             connectionProvider.setProperty("user", tenantConnection.getSchemaUsername());
             logger.debug("{}", tenantConnection.getSchemaUsername());
-            connectionProvider.setProperty("password", databasePasswordEncryptor.decrypt(tenantConnection.getSchemaPassword()).trim());
+            connectionProvider.setProperty("password", tenantConnection.getSchemaPassword());
             sqlReportDataFactory.setConnectionProvider(connectionProvider);
         }
     }
@@ -331,7 +318,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
         String schemaPort = tenantConnection.getSchemaServerPort();
         String schemaName = tenantConnection.getSchemaName();
         String schemaUsername = tenantConnection.getSchemaUsername();
-        String schemaPassword = tenantConnection.getSchemaPassword();        
+        String schemaPassword = tenantConnection.getSchemaPassword();
         String schemaConnectionParameters = tenantConnection.getSchemaConnectionParameters();
         // Properties to ReadOnly case
         if (fineractProperties.getMode().isReadOnlyMode()) {
@@ -363,10 +350,5 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             return defaultValue;
         }
         return applicationContext.getEnvironment().getProperty(propertyName, defaultValue);
-    }
-
-    @Override
-    public List<ReportExportType> getAvailableExportTargets() {
-        throw new UnsupportedOperationException("Not supported yet."); 
     }
 }

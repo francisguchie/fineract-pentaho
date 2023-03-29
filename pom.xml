@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -10,39 +10,40 @@
     </parent>
     <groupId>community.mifos</groupId>
     <artifactId>pentaho-plugin</artifactId>
-    <version>1.8.4-SNAPSHOT</version>
+    <version>1.8.3-SNAPSHOT</version>
     <name>pentaho-plugin</name>
     <description>Mifos Pentaho Reporting Plugin for Apache Fineract</description>
 
     <properties>
         <java.version>17</java.version>
-        <fineract.version>0.0.108-dcbc0e38</fineract.version>
+        <fineract.version>0.0.0-0f0010d1-SNAPSHOT</fineract.version>
         <pentaho.version>9.5.0.0-SNAPSHOT</pentaho.version>
-        <graal.version>22.3.1</graal.version>
+        <graal.version>22.2.0</graal.version>
         <eclipselink.version>2.7.10</eclipselink.version>
         <truth.version>1.1.3</truth.version>
+        <lombok.version>1.18.24</lombok.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-            <scope>compile</scope>            
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <scope>compile</scope>            
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <scope>compile</scope>            
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-            <scope>compile</scope>            
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -63,23 +64,22 @@
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
             <scope>compile</scope>
-	</dependency>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <scope>compile</scope>
-	</dependency>
+        </dependency>
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>eclipselink</artifactId>
             <version>${eclipselink.version}</version>
             <scope>compile</scope>
-	</dependency>
+        </dependency>
         <dependency>
             <groupId>org.apache.fineract</groupId>
             <artifactId>fineract-provider</artifactId>
             <version>${fineract.version}</version>
-            <classifier>plain</classifier>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
@@ -87,126 +87,116 @@
                     <artifactId>fineract-avro-schemas</artifactId>
                 </exclusion>
             </exclusions>
-	</dependency>
-        <!--LOCAL JAR FILE
-        <dependency>
-            <groupId>org.apache.fineract</groupId>
-            <artifactId>fineract-provider</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>$HOME/fineract/fineract-provider/build/libs/fineract-provider-0.0.0-2ac92089-plain.jar</systemPath>
         </dependency>
-        -->
         <dependency>
             <groupId>org.pentaho.reporting.engine</groupId>
             <artifactId>classic-core</artifactId>
             <version>${pentaho.version}</version>
-              
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.pentaho.reporting.engine</groupId>
             <artifactId>classic-extensions</artifactId>
             <version>${pentaho.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.pentaho.reporting.engine</groupId>
             <artifactId>classic-extensions-scripting</artifactId>
             <version>${pentaho.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mozilla</groupId>
-                    <artifactId>rhino</artifactId>
-                </exclusion>
-            </exclusions>  
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.pentaho.reporting.engine</groupId>
             <artifactId>wizard-core</artifactId>
             <version>${pentaho.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.pentaho.reporting.library</groupId>
             <artifactId>libbase</artifactId>
             <version>${pentaho.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.pentaho.reporting.library</groupId>
             <artifactId>libxml</artifactId>
             <version>${pentaho.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.pentaho.reporting.library</groupId>
             <artifactId>libserializer</artifactId>
             <version>${pentaho.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.pentaho.reporting.library</groupId>
             <artifactId>librepository</artifactId>
             <version>${pentaho.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.pentaho.reporting.library</groupId>
             <artifactId>libloader</artifactId>
             <version>${pentaho.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.pentaho.reporting.library</groupId>
             <artifactId>libformula</artifactId>
             <version>${pentaho.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.pentaho.reporting.library</groupId>
             <artifactId>libformat</artifactId>
             <version>${pentaho.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.pentaho.reporting.library</groupId>
             <artifactId>libfonts</artifactId>
             <version>${pentaho.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.pentaho.reporting.library</groupId>
             <artifactId>libdocbundle</artifactId>
             <version>${pentaho.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.graalvm.js</groupId>
             <artifactId>js</artifactId>
             <version>${graal.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.graalvm.js</groupId>
             <artifactId>js-scriptengine</artifactId>
             <version>${graal.version}</version>
-            <scope>compile</scope>            
-	</dependency>
-        <!-- Testing-->
+            <scope>compile</scope>
+        </dependency>
+        <!-- Testing -->
         <dependency>
             <groupId>org.apache.fineract</groupId>
             <artifactId>fineract-client</artifactId>
             <version>${fineract.version}</version>
-            <scope>compile</scope>            
-	</dependency>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>com.google.truth</groupId>
-            <artifactId>truth</artifactId>            
+            <artifactId>truth</artifactId>
             <version>${truth.version}</version>
-            <scope>compile</scope>            
-	</dependency>            
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -221,11 +211,6 @@
     </build>
 
     <repositories>
-        <repository>          
-          <id>fineract-snapshot</id>
-          <name>libs-snapshot-local</name>
-          <url>https://mifos.jfrog.io/artifactory/libs-snapshot-local</url>
-        </repository>
         <repository>
             <id>oss-sonatype</id>
             <name>oss-sonatype</name>
@@ -247,12 +232,12 @@
             <name>Spring Milestones</name>
             <url>https://repo.spring.io/milestone</url>
         </repository>
-        <repository>          
-          <id>fineract-release</id>
-          <name>libs-release-local</name>
-          <url>https://mifos.jfrog.io/artifactory/libs-release-local</url>
+        <repository>
+            <snapshots/>
+            <id>snapshots</id>
+            <name>libs-snapshot-local</name>
+            <url>https://mifos.jfrog.io/artifactory/libs-snapshot-local</url>
         </repository>
-        
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -267,15 +252,15 @@
             <id>spring-milestones</id>
             <name>Spring Milestones</name>
             <url>https://repo.spring.io/milestone</url>
-        </pluginRepository>        
-        
+        </pluginRepository>
         <pluginRepository>
-            <id>release</id>
-          <name>libs-release-local</name>
-          <url>https://mifos.jfrog.io/artifactory/libs-release-local</url>
+            <snapshots/>
+            <id>snapshots</id>
+            <name>libs-snapshot-local</name>
+            <url>https://mifos.jfrog.io/artifactory/libs-snapshot-local</url>
         </pluginRepository>
     </pluginRepositories>
-    
+
     <distributionManagement>
         <repository>
             <id>central</id>
