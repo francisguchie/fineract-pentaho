@@ -26,7 +26,7 @@ import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConn
 import org.apache.fineract.infrastructure.core.exception.PlatformDataIntegrityException;
 import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.report.annotation.ReportService;
-import org.apache.fineract.infrastructure.report.service.database.DatabasePasswordEncryptor;
+import org.apache.fineract.infrastructure.report.service.database.DatabasePasswordEncryptorPentaho;
 import org.apache.fineract.infrastructure.security.constants.TenantConstants;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.pentaho.reporting.engine.classic.core.*;

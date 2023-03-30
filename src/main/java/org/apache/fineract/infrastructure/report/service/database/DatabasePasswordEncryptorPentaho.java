@@ -31,7 +31,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class DatabasePasswordEncryptor implements PasswordEncryptor {
+public class databasePasswordEncryptorPentaho implements PasswordEncryptor {
 
     public static final String DEFAULT_ENCRYPTION = "AES/CBC/PKCS5Padding";
 
