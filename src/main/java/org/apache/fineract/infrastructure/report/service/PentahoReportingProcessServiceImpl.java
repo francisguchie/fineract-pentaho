@@ -71,7 +71,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
     private static final Logger logger = LoggerFactory.getLogger(PentahoReportingProcessServiceImpl.class);
     private final String mifosBaseDir = System.getProperty("user.home") + File.separator + ".mifosx";
-    private final DatabasePasswordEncryptor databasePasswordEncryptor;
+    private final DatabasePasswordEncryptorPentaho databasePasswordEncryptorPentaho;
     private final PlatformSecurityContext context;
     private final DataSource tenantDataSource;
     @Autowired
@@ -85,11 +85,11 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
 
     @Autowired
     public PentahoReportingProcessServiceImpl(final PlatformSecurityContext context,
-                                              final @Qualifier("hikariTenantDataSource") DataSource tenantDataSource, DatabasePasswordEncryptor databasePasswordEncryptor) {
+                                              final @Qualifier("hikariTenantDataSource") DataSource tenantDataSource, DatabasePasswordEncryptorPentaho databasePasswordEncryptorPentaho) {
         ClassicEngineBoot.getInstance().start();
         this.tenantDataSource = tenantDataSource;
         this.context = context;
-        this.databasePasswordEncryptor = databasePasswordEncryptor;
+        this.databasePasswordEncryptorPentaho = databasePasswordEncryptorPentaho;
     }
 
     @Override
@@ -257,7 +257,7 @@ public class PentahoReportingProcessServiceImpl implements ReportingProcessServi
             if (tenantConnection.getSchemaPassword().equalsIgnoreCase("") || tenantConnection.getSchemaPassword() == null) {
                 rptParamValues.put("password", environment.getProperty("FINERACT_DEFAULT_TENANTDB_PWD"));
             } else {
-                rptParamValues.put("password", databasePasswordEncryptor.decrypt(tenantConnection.getSchemaPassword()));
+                rptParamValues.put("password", databasePasswordEncryptorPentaho.decrypt(tenantConnection.getSchemaPassword()));
             }
 
         } catch (Throwable t) {
